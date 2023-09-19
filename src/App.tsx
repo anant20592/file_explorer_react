@@ -47,6 +47,7 @@ export const App: FC<{ name: string }> = ({ name }) => {
         folder: [],
         label: 'test',
       });
+      return obj
     }
     const latestArray = obj.folder.map((folder) => {
       return addFolder(id, folder);
@@ -56,14 +57,36 @@ export const App: FC<{ name: string }> = ({ name }) => {
   };
 
   const handleFolder = (id: string | number) => {
+    console.log("isd-: ", id)
     const updatedList = addFolder(id, itemList);
     setItemList(updatedList);
   };
 
+  const deleteFolder = (id: string | number, obj: FileExplorer) => {
+    if (id === obj.id) {
+      obj.id = null;
+      return obj;
+    }
+    const latestArray = obj.folder.map((folder) => {
+      return deleteFolder(id, folder);
+    });
+    const notNull = latestArray.filter((arr: FileExplorer) => {
+      return arr.id !== null;
+    });
+    console.log(notNull)
+    return { ...obj, folder: notNull };
+
+  }
+
+  const handleDeleteAction  = (id: string | number, action: string) => {
+    console.log(action, id)
+    if(action === 'folder') setItemList(deleteFolder(id, itemList));
+  }
+
   return (
     <div>
       <h1>File Explorer</h1>
-      {<Add items={itemList} addFolder={(id) => handleFolder(id)} />}
+      {<Add items={itemList} addFolder={(id) => handleFolder(id)} onDelete={(id, action) => handleDeleteAction(id, action)}/>}
     </div>
   );
 };

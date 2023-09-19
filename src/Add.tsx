@@ -14,7 +14,7 @@ export interface FileExplorer {
 }
 interface AddProps {
   items: FileExplorer;
-  onDelete: (id: string | number) => void;
+  onDelete: (id: string | number, action: string) => void;
   onEdit: (id: string | number) => void;
   addFolder: (id: string | number) => void;
   addFile: (id: string | number) => void;
@@ -23,8 +23,8 @@ interface AddProps {
 const Add = ({ items, onDelete, onEdit, addFolder, addFile }: AddProps) => {
   const [expand, setExpand] = React.useState<boolean>(false);
 
-  const handleDelete = (id: string | number) => {
-    onDelete?.(id);
+  const handleDelete = (id: string | number, action: string) => {
+    onDelete?.(id, action);
   };
 
   const handleEdit = (id: string | number) => {
@@ -32,7 +32,8 @@ const Add = ({ items, onDelete, onEdit, addFolder, addFile }: AddProps) => {
   };
 
   const handleFolder = (id: string | number) => {
-    addFolder?.(id);
+    console.log('fgfgf- ', id);
+    addFolder(id);
   };
 
   const handleFile = (id: string | number) => {
@@ -47,6 +48,7 @@ const Add = ({ items, onDelete, onEdit, addFolder, addFile }: AddProps) => {
           justifyContent: 'space-between',
           cursor: 'pointer',
         }}
+        key={items.id}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <img
@@ -65,35 +67,45 @@ const Add = ({ items, onDelete, onEdit, addFolder, addFile }: AddProps) => {
             width={'14px'}
             onClick={() => handleFolder(items.id)}
           />
-          <img
+          {/* <img
             src={newfileIcon}
             style={{ marginRight: '4px' }}
             width={'12px'}
             onClick={() => handleFile(items.id)}
-          />
+          /> */}
           <img
             src={deleteIcon}
             style={{ marginRight: '4px' }}
             width={'12px'}
-            onClick={() => handleDelete(items.id)}
+            onClick={() => handleDelete(items.id, 'folder')}
           />
-          <img
+          {/* <img
             src={editIcon}
             style={{ marginRight: '4px' }}
             width={'12px'}
             onClick={() => handleEdit(items.id)}
-          />
+          /> */}
         </div>
       </div>
       {expand &&
         items.folder.map((f) => (
-          <div style={{ marginLeft: '8px' }}>
-            <div style={{ marginLeft: '8px' }}>{<Add items={f} />}</div>
+          <div style={{ marginLeft: '8px' }} key={`folder_${f.id}`}>
+            {
+              <Add
+                items={f}
+                addFolder={() => handleFolder(f.id)}
+                onDelete={() => handleDelete(f.id, 'folder')}
+                key={`folder_${f.id}`}
+              />
+            }
           </div>
         ))}
       {expand &&
         items.files.map((file) => (
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div
+            style={{ display: 'flex', justifyContent: 'space-between' }}
+            key={`files_${file.id}`}
+          >
             <div key={file.id} style={{ marginLeft: '16px' }}>
               <img
                 src={newfileIcon}
@@ -107,7 +119,7 @@ const Add = ({ items, onDelete, onEdit, addFolder, addFile }: AddProps) => {
                 src={deleteIcon}
                 style={{ marginRight: '4px' }}
                 width={'12px'}
-                onClick={() => handleDelete(items.id)}
+                onClick={() => handleDelete(items.id, 'file')}
               />
               <img
                 src={editIcon}
